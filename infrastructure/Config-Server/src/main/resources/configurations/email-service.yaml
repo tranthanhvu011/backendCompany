@@ -1,0 +1,37 @@
+# ===========================================
+# EMAIL-SERVICE CONFIGURATION
+# ===========================================
+# File này CHỈ dành riêng cho Email Service
+
+server:
+  port: 8082
+
+spring:
+  # Kafka consumer for notification events
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: email-service-group
+      auto-offset-reset: earliest
+  
+  # Email configuration (SMTP)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vutranorhilsun@gmail.com
+    password: psyd kmim ofsv qpmc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp
+
+# Service-specific settings
+email-service:
+  email:
+    from: noreply@company.com
+    templates-path: classpath:/templates/email/

@@ -1,0 +1,42 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: email-service
+  config:
+    import: "optional:configserver:http://localhost:8888"
+  
+  # Mail configuration (fallback nếu Config Server không có)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vutranorhilsun@gmail.com
+    password: psyd kmim ofsv qpmc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+  # Kafka
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: email-service-group
+      auto-offset-reset: earliest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Logging
+logging:
+  level:
+    com.company: DEBUG
+    org.springframework.mail: DEBUG

@@ -1,0 +1,37 @@
+# ===========================================
+# USER-SERVICE CONFIGURATION
+# ===========================================
+# File này CHỈ dành riêng cho User Service
+# Sẽ override config trong application.yaml
+
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/user-service?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456789
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: UserServiceHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+# Service-specific settings
+user-service:
+  default-page-size: 20
+  max-page-size: 100
+  password:
+    min-length: 8
+    require-special-char: true

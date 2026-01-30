@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/infrastructure" />
+            <option value="$PROJECT_DIR$/infrastructure/Api-Gateway" />
+            <option value="$PROJECT_DIR$/infrastructure/Config-Server" />
+            <option value="$PROJECT_DIR$/infrastructure/Eureka-Server" />
+            <option value="$PROJECT_DIR$/libraries" />
+            <option value="$PROJECT_DIR$/libraries/common-core" />
+            <option value="$PROJECT_DIR$/libraries/common-dto" />
+            <option value="$PROJECT_DIR$/libraries/common-jwt" />
+            <option value="$PROJECT_DIR$/libraries/common-security" />
+            <option value="$PROJECT_DIR$/service" />
+            <option value="$PROJECT_DIR$/service/User-Service" />
+            <option value="$PROJECT_DIR$/service/email-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

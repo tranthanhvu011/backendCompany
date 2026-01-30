@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/infrastructure/Api-Gateway/Company-Microservices.infrastructure.Api-Gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/infrastructure/Api-Gateway/Company-Microservices.infrastructure.Api-Gateway.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libraries/common-core/Company-Microservices.libraries.common-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/libraries/common-core/Company-Microservices.libraries.common-core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libraries/common-dto/Company-Microservices.libraries.common-dto.main.iml" filepath="$PROJECT_DIR$/.idea/modules/libraries/common-dto/Company-Microservices.libraries.common-dto.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libraries/common-jwt/Company-Microservices.libraries.common-jwt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/libraries/common-jwt/Company-Microservices.libraries.common-jwt.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libraries/common-security/Company-Microservices.libraries.common-security.main.iml" filepath="$PROJECT_DIR$/.idea/modules/libraries/common-security/Company-Microservices.libraries.common-security.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/service/User-Service/Company-Microservices.service.User-Service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/service/User-Service/Company-Microservices.service.User-Service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/service/email-service/Company-Microservices.service.email-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/service/email-service/Company-Microservices.service.email-service.main.iml" />
+    </modules>
+  </component>
+</project>

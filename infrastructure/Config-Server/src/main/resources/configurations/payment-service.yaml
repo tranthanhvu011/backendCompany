@@ -1,0 +1,47 @@
+# ===========================================
+# PAYMENT-SERVICE CONFIGURATION
+# ===========================================
+# File này CHỈ dành riêng cho Payment Service
+
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_db
+    username: postgres
+    password: ${DB_PASSWORD:postgres123}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: PaymentServiceHikariPool
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+# Kafka for payment events
+spring.kafka:
+  bootstrap-servers: localhost:9092
+  consumer:
+    group-id: payment-service-group
+  producer:
+    acks: all  # Ensure delivery for payment events
+
+# Payment gateway integrations
+payment:
+  stripe:
+    api-key: ${STRIPE_API_KEY:sk_test_xxx}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_xxx}
+  vnpay:
+    tmn-code: ${VNPAY_TMN_CODE:DEMO}
+    hash-secret: ${VNPAY_HASH_SECRET:secret}
+    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  momo:
+    partner-code: ${MOMO_PARTNER_CODE:DEMO}
+    access-key: ${MOMO_ACCESS_KEY:xxx}
+    secret-key: ${MOMO_SECRET_KEY:xxx}
+
+# Service-specific settings
+payment-service:
+  retry-attempts: 3
+  timeout-seconds: 30

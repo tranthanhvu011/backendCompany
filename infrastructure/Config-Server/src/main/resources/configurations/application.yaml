@@ -1,0 +1,92 @@
+# ===========================================
+# SHARED CONFIGURATION FOR ALL MICROSERVICES
+# ===========================================
+# File này được TẤT CẢ services sử dụng
+# Đặt các config chung ở đây
+
+# -----------------------------
+# EUREKA CLIENT (Service Discovery)
+# -----------------------------
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# -----------------------------
+# ACTUATOR ENDPOINTS
+# -----------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,refresh,circuitbreakers
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+# -----------------------------
+# LOGGING (Chung cho tất cả services)
+# -----------------------------
+logging:
+  level:
+    root: INFO
+    com.company: DEBUG
+    org.springframework.cloud: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# -----------------------------
+# RESILIENCE4J CIRCUIT BREAKER
+# -----------------------------
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        wait-duration-in-open-state: 5s
+        failure-rate-threshold: 50
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 500ms
+
+# -----------------------------
+# CORS CONFIGURATION
+# -----------------------------
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:4200
+  allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+
+# -----------------------------
+# JWT SECURITY (Dùng chung key)
+# -----------------------------
+jwt:
+  secret: your-256-bit-secret-key-here-change-in-production
+  expiration: 86400000  # 24 hours
+  refresh-expiration: 604800000  # 7 days
+
+# -----------------------------
+# API VERSIONING
+# -----------------------------
+api:
+  version: v1
+  base-path: /api/${api.version}

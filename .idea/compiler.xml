@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.36/5a30490a6e14977d97d9c73c924c1f1b5311ea95/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="Company-Microservices.libraries.common-security.main" />
+        <module name="Company-Microservices.infrastructure.Api-Gateway.main" />
+        <module name="Company-Microservices.libraries.common-core.main" />
+        <module name="Company-Microservices.libraries.common-dto.main" />
+        <module name="Company-Microservices.service.email-service.main" />
+        <module name="Company-Microservices.service.User-Service.main" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/3.4.2/4f9e3e0c959aaf5fb24fd885f9ce201d8643f0dc/spring-boot-configuration-processor-3.4.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.36/5a30490a6e14977d97d9c73c924c1f1b5311ea95/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="Company-Microservices.libraries.common-jwt.main" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="21" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Company-Microservices.infrastructure.Api-Gateway" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Api-Gateway.main" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Api-Gateway.test" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Config-Server" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Config-Server.main" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Config-Server.test" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Eureka-Server" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Eureka-Server.main" options="-parameters" />
+      <module name="Company-Microservices.infrastructure.Eureka-Server.test" options="-parameters" />
+      <module name="Company-Microservices.service.User-Service" options="-parameters" />
+      <module name="Company-Microservices.service.User-Service.main" options="-parameters" />
+      <module name="Company-Microservices.service.User-Service.test" options="-parameters" />
+      <module name="Company-Microservices.service.email-service" options="-parameters" />
+      <module name="Company-Microservices.service.email-service.main" options="-parameters" />
+      <module name="Company-Microservices.service.email-service.test" options="-parameters" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,29 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.company'
+version = '1.0.0'
+description = 'Common JWT Library - JWT Token utilities for Gateway and Services'
+
+dependencies {
+    // JWT
+    api 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    
+    // Spring Boot (for @ConfigurationProperties)
+    compileOnly 'org.springframework.boot:spring-boot-autoconfigure'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Logging
+    compileOnly 'org.slf4j:slf4j-api'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

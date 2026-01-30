@@ -1,0 +1,31 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.company'
+version = '1.0.0'
+description = 'Common DTO Library - Request/Response DTOs, API Response, Pagination'
+
+
+
+dependencies {
+    // Validation
+    api 'jakarta.validation:jakarta.validation-api'
+    
+    // Spring Data (for PageRequest, Sort, etc.)
+    compileOnly 'org.springframework.data:spring-data-commons'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Jackson for JSON serialization
+    api 'com.fasterxml.jackson.core:jackson-annotations'
+    
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
