@@ -17,6 +17,7 @@ public enum ErrorCode {
     USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "Username đã được sử dụng"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Email hoặc mật khẩu không đúng"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy user"),
+    ACCOUNT_DISABLED(HttpStatus.LOCKED, "Tài khoản của bạn đã bị khóa."),
     
     // OTP errors
     OTP_INVALID(HttpStatus.BAD_REQUEST, "Mã OTP không đúng"),

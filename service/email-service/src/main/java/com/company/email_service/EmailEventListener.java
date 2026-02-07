@@ -31,7 +31,7 @@ public class EmailEventListener {
             log.info("Parsed email event: {} for {}", event.getEventType(), event.getTo());
 
             switch (event.getEventType()) {
-                case "OTP_EMAIL" -> {
+                case "OTP_EMAIL_REGISTERED" -> {
                     String otp = (String) event.getTemplateData();
                     emailSenderService.sendOtpEmail(event.getTo(), otp);
                 }

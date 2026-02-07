@@ -4,7 +4,8 @@ import com.company.common.core.exception.BusinessException;
 import com.company.common.core.exception.ErrorCode;
 import com.company.common.core.util.StringUtils;
 import com.company.common.dto.event.EmailEvent;
-import com.company.userservice.dto.data.RegisterData;
+import com.company.common.security.jwt.JwtTokenProvider;
+import com.company.userservice.dto.request.LoginRequest;
 import com.company.userservice.dto.request.RegisterRequest;
 import com.company.userservice.dto.request.SendOtpRequest;
 import com.company.userservice.dto.response.MessageResponse;
@@ -22,6 +23,7 @@ import com.company.common.core.constant.RedisConstants;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +38,7 @@ public class AuthService {
 
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public boolean checkEmailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
@@ -118,15 +121,15 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email already exists!");
         }
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new BusinessException("Username already exists!");
-        }
+//        if (userRepository.existsByUsername(request.getUsername())) {
+//            throw new BusinessException("Username already exists!");
+//        }
         String otp = String.format("%06d", new SecureRandom().nextInt(999999));
         redisTemplate.opsForValue().set(RedisConstants.OTP_PREFIX + request.getEmail(), otp,RedisConstants.OTP_EXPIRE_MINUTES, TimeUnit.MINUTES);
         try {
             String eventJson = objectMapper.writeValueAsString(EmailEvent.builder()
                     .eventId(java.util.UUID.randomUUID().toString())
-                    .eventType("OTP_EMAIL")
+                    .eventType("OTP_EMAIL_REGISTERED")
                     .timestamp(java.time.LocalDateTime.now())
                     .to(request.getEmail())
                     .templateData(otp)
@@ -137,4 +140,25 @@ public class AuthService {
         }
         return MessageResponse.success("Mã OTP đã gửi đến: " + request.getEmail());
     }
+    @Transactional
+    public MessageResponse loginUser(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CREDENTIALS));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        if (!user.isEnabled()) {
+            throw new BusinessException(ErrorCode.ACCOUNT_DISABLED);
+        }
+
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), user.getRoles());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
+        redisTemplate.opsForValue().set(RedisConstants.REFRESH_TOKEN_PREFIX + user.getEmail(), refreshToken, RedisConstants.REFRESH_EXPIRE_DAYS, TimeUnit.DAYS);
+        user.setLastLoginAt(java.time.LocalDateTime.now());
+        userRepository.save(user);
+        return MessageResponse.success("Đăng nhập thành công", Map.of("accessToken", accessToken, "refreshToken", refreshToken, "tokenType", "Bearer"));
+    }
+
 }

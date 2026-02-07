@@ -1,8 +1,10 @@
 package com.company.userservice.controller;
 
 import com.company.common.dto.response.ApiResponse;
+import com.company.userservice.dto.request.LoginRequest;
 import com.company.userservice.dto.request.RegisterRequest;
 import com.company.userservice.dto.request.SendOtpRequest;
+import com.company.userservice.dto.response.MessageResponse;
 import com.company.userservice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +37,9 @@ public class AuthController {
         boolean exists = authService.checkUsernameExists(username);
         return ResponseEntity.ok(ApiResponse.success(exists, "Kiểm tra thành công"));
     }
-
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<MessageResponse>> login(@Valid @RequestBody LoginRequest request) {
+        MessageResponse response = authService.loginUser(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "Đăng nhập thành công"));
+    }
 }
