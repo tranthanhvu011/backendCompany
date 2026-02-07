@@ -10,7 +10,7 @@ import java.util.Map;
  * Email Controller - REST API for manual email testing
  */
 @RestController
-@RequestMapping("/api/email")
+@RequestMapping("/api/v1/email")
 @RequiredArgsConstructor
 public class EmailController {
 

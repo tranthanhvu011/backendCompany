@@ -23,8 +23,8 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	
-	// JWT Library
-	implementation project(':libraries:common-jwt')
+	// JWT + Security Library (unified JWT handling)
+	implementation project(':libraries:common-security')
 }
 
 

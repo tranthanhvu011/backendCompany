@@ -3,7 +3,6 @@ rootProject.name = 'Company-Microservices'
 // Libraries
 include 'libraries:common-core'
 include 'libraries:common-dto'
-include 'libraries:common-jwt'
 include 'libraries:common-security'
 
 // Infrastructure
@@ -17,7 +16,6 @@ include 'service:email-service'
 // Customizing project paths (Optional, but cleaner)
 project(':libraries:common-core').projectDir = file('libraries/common-core')
 project(':libraries:common-dto').projectDir = file('libraries/common-dto')
-project(':libraries:common-jwt').projectDir = file('libraries/common-jwt')
 project(':libraries:common-security').projectDir = file('libraries/common-security')
 project(':infrastructure:Eureka-Server').projectDir = file('infrastructure/Eureka-Server')
 project(':infrastructure:Config-Server').projectDir = file('infrastructure/Config-Server')

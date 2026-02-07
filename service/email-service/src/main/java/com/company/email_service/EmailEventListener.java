@@ -1,6 +1,7 @@
 package com.company.email_service;
 
 import com.company.common.dto.event.EmailEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,15 +16,20 @@ import org.springframework.stereotype.Service;
 public class EmailEventListener {
 
     private final EmailSenderService emailSenderService;
+    private final ObjectMapper objectMapper;
 
     /**
-     * Listen for email events from Kafka
+     * Listen for email events from Kafka.
+     * Message is received as JSON String (sent by AuthService via objectMapper.writeValueAsString).
      */
     @KafkaListener(topics = "email-topic", groupId = "email-service-group")
-    public void handleEmailEvent(EmailEvent event) {
-        log.info("Received email event: {} for {}", event.getEventType(), event.getTo());
-        
+    public void handleEmailEvent(String message) {
+        log.info("Received raw Kafka message: {}", message);
+
         try {
+            EmailEvent event = objectMapper.readValue(message, EmailEvent.class);
+            log.info("Parsed email event: {} for {}", event.getEventType(), event.getTo());
+
             switch (event.getEventType()) {
                 case "OTP_EMAIL" -> {
                     String otp = (String) event.getTemplateData();
@@ -38,7 +44,6 @@ public class EmailEventListener {
                     emailSenderService.sendResetPasswordEmail(event.getTo(), token);
                 }
                 case "EMAIL_SEND" -> {
-                    // Generic email with HTML content
                     if (event.getHtmlContent() != null) {
                         emailSenderService.sendHtmlEmail(
                             event.getTo(), 
@@ -59,8 +64,7 @@ public class EmailEventListener {
             log.info("Email sent successfully for event: {}", event.getEventId());
             
         } catch (Exception e) {
-            log.error("Failed to send email for event: {}", event.getEventId(), e);
-            // TODO: Implement retry logic or dead letter queue
+            log.error("Failed to process email event: {}", e.getMessage(), e);
         }
     }
 }

@@ -1,7 +1,12 @@
+
 server:
   port: 8080
-
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
 spring:
+
   application:
     name: api-gateway
   config:
@@ -17,11 +22,11 @@ spring:
          - id: auth-service
            uri: lb://USER-SERVICE
            predicates:
-             - Path=/api/auth/**
+             - Path=/api/v1/auth/**
          - id: user-service
            uri: lb://USER-SERVICE
            predicates:
-             - Path=/api/user/**
+             - Path=/api/v1/user/**
         #   filters:
         #     - StripPrefix=1
 
@@ -43,6 +48,6 @@ management:
 
 # JWT Configuration
 jwt:
-  secret: your-256-bit-secret-key-change-this-in-production
+  secret: eW91ci0yNTYtYml0LXNlY3JldC1rZXktY2hhbmdlLXRoaXMtaW4tcHJvZHVjdGlvbg==
   expiration: 86400000
   refresh-expiration: 604800000

@@ -11,7 +11,6 @@ import com.company.userservice.dto.response.MessageResponse;
 import com.company.userservice.entity.User;
 import com.company.userservice.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,9 +31,9 @@ import java.util.concurrent.TimeUnit;
 @Transactional(readOnly = true)
 public class AuthService {
     private final UserRepository userRepository;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final PasswordEncoder passwordEncoder;
-    private final ObjectCodec objectCodec;
+
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
@@ -65,7 +64,7 @@ public class AuthService {
         // 3. Kiểm tra OTP
         if (!storedOtp.equals(request.getOtp())) {
             String attemptsKey = RedisConstants.OTP_ATTEMPTS_PREFIX + email;  // Đếm lần sai của OTP hiện tại
-            String totalAttemptsKey = "total_attempts:" + email;               // Đếm tổng số lần sai (cả 9 lần)
+            String totalAttemptsKey = RedisConstants.TOTAL_ATTEMPTS_PREFIX + email;  // Đếm tổng số lần sai (cả 9 lần)
 
             Long currentAttempts = redisTemplate.opsForValue().increment(attemptsKey);
             Long totalAttempts = redisTemplate.opsForValue().increment(totalAttemptsKey);
@@ -104,7 +103,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .emailVerified(true)
                 .enabled(true)
-                .roles(Set.of("ROLE_USER"))
+                .roles(Set.of("USER"))
                 .build();
 
         userRepository.save(user);
@@ -112,7 +111,7 @@ public class AuthService {
         // 6. Dọn dẹp Redis
         redisTemplate.delete(otpKey);
         redisTemplate.delete(RedisConstants.OTP_ATTEMPTS_PREFIX + email);
-        redisTemplate.delete("total_attempts:" + email);
+        redisTemplate.delete(RedisConstants.TOTAL_ATTEMPTS_PREFIX + email);
         return MessageResponse.success("Đăng ký thành công!");
     }
     public MessageResponse sendOTP(SendOtpRequest request) {
@@ -123,13 +122,19 @@ public class AuthService {
             throw new BusinessException("Username already exists!");
         }
         String otp = String.format("%06d", new SecureRandom().nextInt(999999));
-
         redisTemplate.opsForValue().set(RedisConstants.OTP_PREFIX + request.getEmail(), otp,RedisConstants.OTP_EXPIRE_MINUTES, TimeUnit.MINUTES);
-        kafkaTemplate.send("email-topic", String.valueOf(EmailEvent.builder()
-                .eventType("OTP_EMAIL")
-                .to(request.getEmail())
-                .templateData(otp)
-                .build()));
+        try {
+            String eventJson = objectMapper.writeValueAsString(EmailEvent.builder()
+                    .eventId(java.util.UUID.randomUUID().toString())
+                    .eventType("OTP_EMAIL")
+                    .timestamp(java.time.LocalDateTime.now())
+                    .to(request.getEmail())
+                    .templateData(otp)
+                    .build());
+            kafkaTemplate.send("email-topic", eventJson);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("Failed to serialize email event");
+        }
         return MessageResponse.success("Mã OTP đã gửi đến: " + request.getEmail());
     }
 }

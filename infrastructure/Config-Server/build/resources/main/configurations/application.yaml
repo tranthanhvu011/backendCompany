@@ -80,7 +80,7 @@ cors:
 # JWT SECURITY (Dùng chung key)
 # -----------------------------
 jwt:
-  secret: your-256-bit-secret-key-here-change-in-production
+  secret: eW91ci0yNTYtYml0LXNlY3JldC1rZXktaGVyZS1jaGFuZ2UtaW4tcHJvZHVjdGlvbg==
   expiration: 86400000  # 24 hours
   refresh-expiration: 604800000  # 7 days
 

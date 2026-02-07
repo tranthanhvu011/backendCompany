@@ -15,7 +15,6 @@
             <option value="$PROJECT_DIR$/libraries" />
             <option value="$PROJECT_DIR$/libraries/common-core" />
             <option value="$PROJECT_DIR$/libraries/common-dto" />
-            <option value="$PROJECT_DIR$/libraries/common-jwt" />
             <option value="$PROJECT_DIR$/libraries/common-security" />
             <option value="$PROJECT_DIR$/service" />
             <option value="$PROJECT_DIR$/service/User-Service" />
