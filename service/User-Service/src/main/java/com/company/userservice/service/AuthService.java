@@ -5,15 +5,15 @@ import com.company.common.core.exception.ErrorCode;
 import com.company.common.core.util.StringUtils;
 import com.company.common.dto.event.EmailEvent;
 import com.company.common.security.jwt.JwtTokenProvider;
-import com.company.userservice.dto.request.LoginRequest;
-import com.company.userservice.dto.request.RegisterRequest;
-import com.company.userservice.dto.request.SendOtpRequest;
+import com.company.userservice.dto.request.*;
+import com.company.userservice.dto.response.AuthResponse;
 import com.company.userservice.dto.response.MessageResponse;
 import com.company.userservice.entity.User;
 import com.company.userservice.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class AuthService {
     private final UserRepository userRepository;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -141,7 +142,7 @@ public class AuthService {
         return MessageResponse.success("Mã OTP đã gửi đến: " + request.getEmail());
     }
     @Transactional
-    public MessageResponse loginUser(LoginRequest request) {
+    public AuthResponse loginUser(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CREDENTIALS));
 
@@ -158,7 +159,88 @@ public class AuthService {
         redisTemplate.opsForValue().set(RedisConstants.REFRESH_TOKEN_PREFIX + user.getEmail(), refreshToken, RedisConstants.REFRESH_EXPIRE_DAYS, TimeUnit.DAYS);
         user.setLastLoginAt(java.time.LocalDateTime.now());
         userRepository.save(user);
-        return MessageResponse.success("Đăng nhập thành công", Map.of("accessToken", accessToken, "refreshToken", refreshToken, "tokenType", "Bearer"));
-    }
 
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .userId(String.valueOf(user.getId()))
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .roles(user.getRoles() != null ? user.getRoles().stream().findFirst().orElse("USER") : "USER")
+                .avatar(user.getAvatar())
+                .build();
+    }
+    @Transactional
+    public MessageResponse forgotPassword(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            throw new BusinessException("Email no exists!");
+        }
+        String emailKey = RedisConstants.RESETPASSWORD_EMAIL_PREFIX + email;
+        String oldToken = (String) redisTemplate.opsForValue().get(emailKey);
+        if (oldToken != null) {
+            redisTemplate.delete(RedisConstants.RESETPASSWORD_PREFIX + oldToken);
+        }
+        String resetToken = java.util.UUID.randomUUID().toString();
+        String linkResetPassword = "http://localhost:5173/reset-password?token=" + resetToken;
+        redisTemplate.opsForValue().set(RedisConstants.RESETPASSWORD_PREFIX + resetToken, email, RedisConstants.RESET_PASSWORD_EXPIRE_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(emailKey, resetToken, RedisConstants.RESET_PASSWORD_EXPIRE_MINUTES, TimeUnit.MINUTES);
+        try {
+            String eventJson = objectMapper.writeValueAsString(EmailEvent.builder()
+                    .eventId(java.util.UUID.randomUUID().toString())
+                    .eventType("RESET_PASSWORD_EMAIL")
+                    .timestamp(java.time.LocalDateTime.now())
+                    .to(email)
+                    .templateData(linkResetPassword)
+                    .build());
+            kafkaTemplate.send("email-topic", eventJson);
+        }catch (JsonProcessingException e) {
+            throw new BusinessException("Failed to serialize email event");
+        }
+        return MessageResponse.success("Truy cập vào email của bạn để lấy lại mật khẩu");
+    }
+    public MessageResponse resetPassword(ResetPasswordRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BusinessException("Mật khẩu xác nhận không khớp!");
+        }
+        String key = RedisConstants.RESETPASSWORD_PREFIX + request.getToken();
+        String email = (String) redisTemplate.opsForValue().get(key);
+        if (email == null) {
+            throw new BusinessException("Link đã hết hạn hoặc không hợp lệ");
+        }
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        redisTemplate.delete(key);
+        return MessageResponse.success("Lấy lại mật khẩu thành công");
+    }
+    public AuthResponse refeshToken(RefreshTokenRequest request) {
+        if (!jwtTokenProvider.validateToken(request.getRefreshToken())) {
+            throw new BusinessException("Invalid refresh token!");
+        }
+        Long userId = jwtTokenProvider.extractUserId(request.getRefreshToken());
+        String username =  jwtTokenProvider.extractUsername(request.getRefreshToken());
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        String storedToken = (String) redisTemplate.opsForValue().get(RedisConstants.REFRESH_TOKEN_PREFIX + user.getEmail());
+        if (storedToken == null || !storedToken.equals(request.getRefreshToken())) {
+            log.warn("Refresh token mismatch for user: {} - session expired or kicked", username);
+            throw new BusinessException("Phiên đăng nhập đã hết hạn!");
+        }
+        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), user.getRoles());
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
+        redisTemplate.opsForValue().set(RedisConstants.REFRESH_TOKEN_PREFIX + user.getEmail(), newRefreshToken, RedisConstants.REFRESH_EXPIRE_DAYS, TimeUnit.DAYS);
+        return AuthResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .userId(String.valueOf(user.getId()))
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .roles(user.getRoles() != null ? user.getRoles().stream().findFirst().orElse("USER") : "USER")
+                .avatar(user.getAvatar())
+                .build();
+    }
 }

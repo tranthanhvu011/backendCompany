@@ -95,21 +95,21 @@ public class EmailSenderService {
     /**
      * Gửi email reset password
      */
-    public void sendResetPasswordEmail(String to, String resetToken) {
+    public void sendResetPasswordEmail(String to, String linkResetToken) {
         String subject = "Yêu cầu đặt lại mật khẩu";
         String body = String.format("""
             Xin chào,
             
             Bạn đã yêu cầu đặt lại mật khẩu.
             
-            Mã xác thực: %s
+            Đường dẫn: %s
             
-            Mã này sẽ hết hạn sau 1 giờ.
+            Đường dẫn này sẽ hết hạn sau 15 phút.
             Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.
             
             Trân trọng,
             Company Team
-            """, resetToken);
+            """, linkResetToken);
         
         sendSimpleEmail(to, subject, body);
     }
