@@ -8,11 +8,17 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.36/5a30490a6e14977d97d9c73c924c1f1b5311ea95/lombok-1.18.36.jar" />
         </processorPath>
         <module name="Company-Microservices.libraries.common-security.main" />
+        <module name="Company-Microservices.service.Chat-Service.main" />
+        <module name="Company-Microservices.service.Product-Service.main" />
+        <module name="Company-Microservices.service.Admin-Service.main" />
         <module name="Company-Microservices.infrastructure.Api-Gateway.main" />
-        <module name="Company-Microservices.libraries.common-core.main" />
         <module name="Company-Microservices.libraries.common-dto.main" />
         <module name="Company-Microservices.service.email-service.main" />
         <module name="Company-Microservices.service.User-Service.main" />
+        <module name="Company-Microservices.service.Seller-Service.main" />
+        <module name="Company-Microservices.service.Order-Service.main" />
+        <module name="Company-Microservices.libraries.common-core.main" />
+        <module name="Company-Microservices.service.Cart-Service.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="21" />
@@ -28,6 +34,24 @@
       <module name="Company-Microservices.infrastructure.Eureka-Server" options="-parameters" />
       <module name="Company-Microservices.infrastructure.Eureka-Server.main" options="-parameters" />
       <module name="Company-Microservices.infrastructure.Eureka-Server.test" options="-parameters" />
+      <module name="Company-Microservices.service.Admin-Service" options="-parameters" />
+      <module name="Company-Microservices.service.Admin-Service.main" options="-parameters" />
+      <module name="Company-Microservices.service.Admin-Service.test" options="-parameters" />
+      <module name="Company-Microservices.service.Cart-Service" options="-parameters" />
+      <module name="Company-Microservices.service.Cart-Service.main" options="-parameters" />
+      <module name="Company-Microservices.service.Cart-Service.test" options="-parameters" />
+      <module name="Company-Microservices.service.Chat-Service" options="-parameters" />
+      <module name="Company-Microservices.service.Chat-Service.main" options="-parameters" />
+      <module name="Company-Microservices.service.Chat-Service.test" options="-parameters" />
+      <module name="Company-Microservices.service.Order-Service" options="-parameters" />
+      <module name="Company-Microservices.service.Order-Service.main" options="-parameters" />
+      <module name="Company-Microservices.service.Order-Service.test" options="-parameters" />
+      <module name="Company-Microservices.service.Product-Service" options="-parameters" />
+      <module name="Company-Microservices.service.Product-Service.main" options="-parameters" />
+      <module name="Company-Microservices.service.Product-Service.test" options="-parameters" />
+      <module name="Company-Microservices.service.Seller-Service" options="-parameters" />
+      <module name="Company-Microservices.service.Seller-Service.main" options="-parameters" />
+      <module name="Company-Microservices.service.Seller-Service.test" options="-parameters" />
       <module name="Company-Microservices.service.User-Service" options="-parameters" />
       <module name="Company-Microservices.service.User-Service.main" options="-parameters" />
       <module name="Company-Microservices.service.User-Service.test" options="-parameters" />

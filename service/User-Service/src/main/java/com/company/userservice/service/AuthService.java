@@ -14,7 +14,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import com.company.common.core.constant.RedisConstants;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -40,6 +43,9 @@ public class AuthService {
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
 
     public boolean checkEmailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
@@ -142,7 +148,7 @@ public class AuthService {
         return MessageResponse.success("Mã OTP đã gửi đến: " + request.getEmail());
     }
     @Transactional
-    public AuthResponse loginUser(LoginRequest request) {
+    public AuthResponse loginUser(LoginRequest request, String portal) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CREDENTIALS));
 
@@ -154,7 +160,10 @@ public class AuthService {
             throw new BusinessException(ErrorCode.ACCOUNT_DISABLED);
         }
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), user.getRoles());
+        Set<String> roles = user.getRoles() != null ? user.getRoles() : Set.of("USER");
+        enforcePortalPolicy(roles, portal);
+
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), roles);
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
         redisTemplate.opsForValue().set(RedisConstants.REFRESH_TOKEN_PREFIX + user.getEmail(), refreshToken, RedisConstants.REFRESH_EXPIRE_DAYS, TimeUnit.DAYS);
         user.setLastLoginAt(java.time.LocalDateTime.now());
@@ -168,9 +177,34 @@ public class AuthService {
                 .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .roles(user.getRoles() != null ? user.getRoles().stream().findFirst().orElse("USER") : "USER")
+                .roles(roles)
                 .avatar(user.getAvatar())
                 .build();
+    }
+
+    private void enforcePortalPolicy(Set<String> roles, String portal) {
+        String normalizedPortal = portal == null ? "user" : portal.trim().toLowerCase(Locale.ROOT);
+        boolean isAdmin = roles.contains("ADMIN");
+        boolean isSeller = roles.contains("SELLER");
+
+        switch (normalizedPortal) {
+            case "admin" -> {
+                if (!isAdmin) {
+                    throw new BusinessException("Tài khoản này không có quyền truy cập", HttpStatus.FORBIDDEN);
+                }
+            }
+            case "seller" -> {
+                if (!isSeller && !isAdmin) {
+                    throw new BusinessException("Tài khoản này không có quyền truy cập", HttpStatus.FORBIDDEN);
+                }
+            }
+            case "user" -> {
+                if (isAdmin) {
+                    throw new BusinessException("Tài khoản này không có quyền truy cập", HttpStatus.FORBIDDEN);
+                }
+            }
+            default -> log.warn("Unknown login portal '{}', skip portal restriction", portal);
+        }
     }
     @Transactional
     public MessageResponse forgotPassword(String email) {
@@ -183,7 +217,7 @@ public class AuthService {
             redisTemplate.delete(RedisConstants.RESETPASSWORD_PREFIX + oldToken);
         }
         String resetToken = java.util.UUID.randomUUID().toString();
-        String linkResetPassword = "http://localhost:5173/reset-password?token=" + resetToken;
+        String linkResetPassword = frontendUrl + "/reset-password?token=" + resetToken;
         redisTemplate.opsForValue().set(RedisConstants.RESETPASSWORD_PREFIX + resetToken, email, RedisConstants.RESET_PASSWORD_EXPIRE_MINUTES, TimeUnit.MINUTES);
         redisTemplate.opsForValue().set(emailKey, resetToken, RedisConstants.RESET_PASSWORD_EXPIRE_MINUTES, TimeUnit.MINUTES);
         try {
@@ -200,6 +234,7 @@ public class AuthService {
         }
         return MessageResponse.success("Truy cập vào email của bạn để lấy lại mật khẩu");
     }
+    @Transactional
     public MessageResponse resetPassword(ResetPasswordRequest request) {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new BusinessException("Mật khẩu xác nhận không khớp!");
@@ -239,8 +274,45 @@ public class AuthService {
                 .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .roles(user.getRoles() != null ? user.getRoles().stream().findFirst().orElse("USER") : "USER")
+                .roles(user.getRoles() != null ? user.getRoles() : Set.of("USER"))
                 .avatar(user.getAvatar())
                 .build();
+    }
+
+    @Transactional
+    public void logoutUser(String refreshToken) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new BusinessException(ErrorCode.REFRESH_TOKEN_INVALID);
+        }
+        String username = jwtTokenProvider.extractUsername(refreshToken);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        String storedToken = (String) redisTemplate.opsForValue().get(RedisConstants.REFRESH_TOKEN_PREFIX + user.getEmail());
+        if (storedToken == null || !storedToken.equals(refreshToken)) {
+            throw new BusinessException(ErrorCode.REFRESH_TOKEN_INVALID);
+        }
+
+        redisTemplate.delete(RedisConstants.REFRESH_TOKEN_PREFIX + user.getEmail());
+        log.info("User {} logged out successfully", username);
+    }
+
+    @Transactional
+    public MessageResponse changePassword(Long userId, ChangePasswordRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BusinessException("Mật khẩu xác nhận không khớp!");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.WRONG_PASSWORD);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        log.info("User {} changed password successfully", user.getUsername());
+        return MessageResponse.success("Đổi mật khẩu thành công!");
     }
 }

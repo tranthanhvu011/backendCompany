@@ -26,9 +26,63 @@ spring:
          - id: user-service
            uri: lb://USER-SERVICE
            predicates:
-             - Path=/api/v1/user/**
-        #   filters:
-        #     - StripPrefix=1
+             - Path=/api/v1/users/**
+         - id: category-service
+           uri: lb://PRODUCT-SERVICE
+           predicates:
+             - Path=/api/v1/categories/**
+         - id: product-service
+           uri: lb://PRODUCT-SERVICE
+           predicates:
+             - Path=/api/v1/products/**
+         - id: cart-service
+           uri: lb://CART-SERVICE
+           predicates:
+             - Path=/api/v1/cart/**
+         - id: seller-products
+           uri: lb://PRODUCT-SERVICE
+           predicates:
+             - Path=/api/v1/seller/products/**
+         - id: seller-sold-accounts
+           uri: lb://PRODUCT-SERVICE
+           predicates:
+             - Path=/api/v1/seller/sold-accounts/**
+         - id: seller-order-service
+           uri: lb://ORDER-SERVICE
+           predicates:
+             - Path=/api/v1/seller/orders/**
+         - id: seller-service
+           uri: lb://SELLER-SERVICE
+           predicates:
+             - Path=/api/v1/seller/**
+         - id: admin-products
+           uri: lb://PRODUCT-SERVICE
+           predicates:
+             - Path=/api/v1/admin/products/**
+         - id: admin-service
+           uri: lb://ADMIN-SERVICE
+           predicates:
+             - Path=/api/v1/admin/**
+         - id: order-service
+           uri: lb://ORDER-SERVICE
+           predicates:
+             - Path=/api/v1/orders/**
+         - id: chat-rest
+           uri: lb://CHAT-SERVICE
+           predicates:
+             - Path=/api/v1/chat/**
+         - id: chat-websocket
+           uri: lb:ws://CHAT-SERVICE
+           predicates:
+             - Path=/ws/chat/**
+         - id: user-avatars
+           uri: lb://USER-SERVICE
+           predicates:
+             - Path=/uploads/avatars/**
+         - id: product-uploads
+           uri: lb://PRODUCT-SERVICE
+           predicates:
+             - Path=/uploads/**
 
 eureka:
   client:
@@ -46,8 +100,8 @@ management:
     gateway:
       enabled: true
 
-# JWT Configuration
+# JWT Security (must match User-Service)
 jwt:
-  secret: eW91ci0yNTYtYml0LXNlY3JldC1rZXktY2hhbmdlLXRoaXMtaW4tcHJvZHVjdGlvbg==
+  secret: eW91ci0yNTYtYml0LXNlY3JldC1rZXktaGVyZS1jaGFuZ2UtaW4tcHJvZHVjdGlvbg==
   expiration: 86400000
   refresh-expiration: 604800000

@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Email hoặc mật khẩu không đúng"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy user"),
     ACCOUNT_DISABLED(HttpStatus.LOCKED, "Tài khoản của bạn đã bị khóa."),
+    WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "Mật khẩu hiện tại không đúng"),
     
     // OTP errors
     OTP_INVALID(HttpStatus.BAD_REQUEST, "Mã OTP không đúng"),
@@ -27,7 +28,23 @@ public enum ErrorCode {
     // Token errors
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Token không hợp lệ"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Token đã hết hạn"),
-    REFRESH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Refresh token không hợp lệ");
+    REFRESH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Refresh token không hợp lệ"),
+
+    // Cart errors
+    CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "Sản phẩm không có trong giỏ hàng"),
+    CART_MAX_ITEMS_EXCEEDED(HttpStatus.BAD_REQUEST, "Giỏ hàng đã đạt tối đa 50 sản phẩm"),
+    CART_PRODUCT_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "Sản phẩm không còn khả dụng"),
+
+    // Seller errors
+    SELLER_REGISTRATION_EXISTS(HttpStatus.CONFLICT, "Bạn đã đăng ký seller rồi"),
+    SELLER_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy thông tin seller"),
+    SELLER_NOT_ACTIVE(HttpStatus.FORBIDDEN, "Tài khoản seller chưa sẵn sàng bán hàng"),
+    SELLER_SUSPENDED(HttpStatus.FORBIDDEN, "Tài khoản seller đã bị tạm khóa"),
+    SELLER_ALREADY_APPROVED(HttpStatus.BAD_REQUEST, "Seller đã được duyệt trước đó"),
+    INVALID_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "Chuyển trạng thái không hợp lệ"),
+
+    // Admin errors
+    ADMIN_FORBIDDEN(HttpStatus.FORBIDDEN, "Bạn không có quyền admin");
     
     private final HttpStatus httpStatus;
     private final String message;

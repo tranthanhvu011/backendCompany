@@ -35,3 +35,7 @@ user-service:
   password:
     min-length: 8
     require-special-char: true
+
+# Application settings
+app:
+  frontend-url: http://localhost:5173

@@ -17,10 +17,22 @@
             <option value="$PROJECT_DIR$/libraries/common-dto" />
             <option value="$PROJECT_DIR$/libraries/common-security" />
             <option value="$PROJECT_DIR$/service" />
+            <option value="$PROJECT_DIR$/service/Admin-Service" />
+            <option value="$PROJECT_DIR$/service/Cart-Service" />
+            <option value="$PROJECT_DIR$/service/Chat-Service" />
+            <option value="$PROJECT_DIR$/service/Order-Service" />
+            <option value="$PROJECT_DIR$/service/Product-Service" />
+            <option value="$PROJECT_DIR$/service/Seller-Service" />
             <option value="$PROJECT_DIR$/service/User-Service" />
             <option value="$PROJECT_DIR$/service/email-service" />
           </set>
         </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/service/Admin-Service" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/service/Seller-Service" />
       </GradleProjectSettings>
     </option>
   </component>

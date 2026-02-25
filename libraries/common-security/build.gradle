@@ -11,6 +11,7 @@ description = 'Common Security Library - JWT, Authentication, Authorization'
 dependencies {
     // Spring Security
     api 'org.springframework.boot:spring-boot-starter-security'
+    api 'org.springframework.boot:spring-boot-starter-aop'
     compileOnly 'org.springframework.boot:spring-boot-starter-web'
     
     // JWT (not managed by Spring BOM, need explicit versions)

@@ -18,6 +18,16 @@ public static final long BLOCK_EXPIRE_MINUTES = 15;
         public static final int MAX_OTP_ATTEMPTS = 3;
         public static final long RESET_PASSWORD_EXPIRE_MINUTES = 15; // 15 phút
 
+        // User Blacklist (force-logout when admin disables account)
+        public static final String USER_BLACKLIST_PREFIX = "blacklisted_user:";
+        public static final long USER_BLACKLIST_EXPIRE_HOURS = 24;
+
+        // Cart
+        public static final String CART_PREFIX = "cart:";
+        public static final long CART_EXPIRE_DAYS = 30;
+        public static final int CART_MAX_ITEMS = 50;
+        public static final int CART_MAX_QUANTITY = 99;
+
         private RedisConstants() {} // Không cho tạo instance
     }
 

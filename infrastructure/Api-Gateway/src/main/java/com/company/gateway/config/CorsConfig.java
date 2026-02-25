@@ -19,8 +19,12 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class CorsConfig {
 
-    private static final String ALLOWED_ORIGIN_1 = "http://localhost:5173";
-    private static final String ALLOWED_ORIGIN_2 = "http://localhost:3000";
+    private static final java.util.Set<String> ALLOWED_ORIGINS = java.util.Set.of(
+        "http://localhost:5173",   // Frontend - User
+        "http://localhost:5174",   // Frontend - Seller
+        "http://localhost:5175",   // Frontend - Admin
+        "http://localhost:3000"    // Dev fallback
+    );
     private static final String ALLOWED_METHODS = "GET, POST, PUT, PATCH, DELETE, OPTIONS";
     private static final String ALLOWED_HEADERS = "*";
     private static final String MAX_AGE = "3600";
@@ -30,7 +34,7 @@ public class CorsConfig {
         return (ServerWebExchange exchange, WebFilterChain chain) -> {
             String origin = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ORIGIN);
 
-            if (origin != null && (origin.equals(ALLOWED_ORIGIN_1) || origin.equals(ALLOWED_ORIGIN_2))) {
+            if (origin != null && ALLOWED_ORIGINS.contains(origin)) {
                 HttpHeaders headers = exchange.getResponse().getHeaders();
                 headers.set(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                 headers.set(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, ALLOWED_METHODS);

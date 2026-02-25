@@ -102,7 +102,13 @@ public class JwtTokenProvider {
      */
     @SuppressWarnings("unchecked")
     public Set<String> extractRoles(String token) {
-        return extractClaim(token, claims -> (Set<String>) claims.get("roles"));
+        return extractClaim(token, claims -> {
+            var roles = claims.get("roles");
+            if (roles instanceof java.util.Collection) {
+                return new java.util.HashSet<>((java.util.Collection<String>) roles);
+            }
+            return java.util.Set.of();
+        });
     }
 
     /**

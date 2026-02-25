@@ -13,6 +13,12 @@ include 'infrastructure:Api-Gateway'
 // Services
 include 'service:User-Service'
 include 'service:email-service'
+include 'service:Product-Service'
+include 'service:Cart-Service'
+include 'service:Seller-Service'
+include 'service:Admin-Service'
+include 'service:Order-Service'
+include 'service:Chat-Service'
 // Customizing project paths (Optional, but cleaner)
 project(':libraries:common-core').projectDir = file('libraries/common-core')
 project(':libraries:common-dto').projectDir = file('libraries/common-dto')
@@ -22,3 +28,9 @@ project(':infrastructure:Config-Server').projectDir = file('infrastructure/Confi
 project(':infrastructure:Api-Gateway').projectDir = file('infrastructure/Api-Gateway')
 project(':service:User-Service').projectDir = file('service/User-Service')
 project(':service:email-service').projectDir = file('service/email-service')
+project(':service:Product-Service').projectDir = file('service/Product-Service')
+project(':service:Cart-Service').projectDir = file('service/Cart-Service')
+project(':service:Seller-Service').projectDir = file('service/Seller-Service')
+project(':service:Admin-Service').projectDir = file('service/Admin-Service')
+project(':service:Order-Service').projectDir = file('service/Order-Service')
+project(':service:Chat-Service').projectDir = file('service/Chat-Service')

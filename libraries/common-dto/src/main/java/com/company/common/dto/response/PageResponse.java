@@ -66,4 +66,21 @@ public class PageResponse<T> {
                 .hasPrevious(false)
                 .build();
     }
+
+    /**
+     * Create PageResponse from Spring Data Page directly
+     */
+    public static <T> PageResponse<T> from(org.springframework.data.domain.Page<T> springPage) {
+        return PageResponse.<T>builder()
+                .content(springPage.getContent())
+                .page(springPage.getNumber())
+                .size(springPage.getSize())
+                .totalElements(springPage.getTotalElements())
+                .totalPages(springPage.getTotalPages())
+                .first(springPage.isFirst())
+                .last(springPage.isLast())
+                .hasNext(springPage.hasNext())
+                .hasPrevious(springPage.hasPrevious())
+                .build();
+    }
 }

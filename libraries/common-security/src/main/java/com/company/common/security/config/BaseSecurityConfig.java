@@ -39,7 +39,14 @@ public class BaseSecurityConfig {
      */
     private static final String[] PUBLIC_ENDPOINTS = {
         "/api/v1/auth/**",
+        "/api/v1/categories/**",
+        "/api/v1/products/**",
+        "/api/v1/seller/*/public",
+        "/api/v1/orders/public/**",
         "/api/public/**",
+        "/api/internal/**",
+        "/api/v1/internal/**",
+        "/uploads/**",
         "/actuator/**",
         "/actuator/health/**",
         "/swagger-ui/**",
